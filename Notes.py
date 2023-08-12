@@ -20,7 +20,7 @@ class NoteManager:
 
     def delete_note(self, note_id):
         self.notes = [note for note in self.notes if note.note_id != int(note_id)]
-    
+
     def edit_note(self, note_id, new_title, new_body):
         for note in self.notes:
             if note.note_id == int(note_id):
@@ -28,7 +28,7 @@ class NoteManager:
                 note.body = new_body
                 note.timestamp = datetime.now()
                 break
-    
+
     def filter_notes_by_date(self, date):
         filtered_notes = [note for note in self.notes if note.timestamp.date() == date]
         return filtered_notes
@@ -45,7 +45,7 @@ class NoteManager:
             notes_data.append(note_data)
         
         with open(filename, 'w') as file:
-            file.write(json.dumps(notes_data, indent=4))
+            json.dump(notes_data, file, indent=4)
 
     def load_notes_from_file(self, filename):
         try:
@@ -64,6 +64,18 @@ class NoteManager:
             note.timestamp = datetime.fromisoformat(note_data['timestamp'])
             self.notes.append(note)
 
+    def display_note_by_id(self, search_id):
+        found_note = None
+        for note in self.notes:
+            if note.note_id == int(search_id):
+                found_note = note
+                break
+
+        if found_note is not None:
+            print(found_note)
+        else:
+            print(f"Заметка с идентификатором {search_id} не найдена.")
+
 def main():
     note_manager = NoteManager()
     note_manager.load_notes_from_file('notes.json')
@@ -72,9 +84,11 @@ def main():
         print('1. Добавить заметку')
         print('2. Удалить заметку')
         print('3. Редактировать заметку')
-        print('4. Просмотреть заметки по дате')
-        print('5. Сохранить изменения')
-        print('6. Выйти из программы')
+        print('4. Просмотреть все заметки')
+        print('5. Просмотреть заметку по идентификатору')
+        print('6. Просмотреть заметки по дате')
+        print('7. Сохранить изменения')
+        print('8. Выйти из программы')
         choice = input('Введите номер операции: ')
 
         if choice == '1':
@@ -92,15 +106,23 @@ def main():
             new_body = input('Введите новый текст заметки: ')
             note_manager.edit_note(note_id, new_title, new_body)
         elif choice == '4':
+            for note in note_manager.notes:
+                print()
+                print(note)
+                print()
+        elif choice == '5':
+            note_id = input('Введите идентификатор заметки для просмотра: ')
+            note_manager.display_note_by_id(note_id)
+        elif choice == '6':
             date_str = input('Введите дату для фильтрации заметок (в формате ГГГГ-ММ-ДД): ')
             date = datetime.strptime(date_str, '%Y-%m-%d').date()
             filtered_notes = note_manager.filter_notes_by_date(date)
             for note in filtered_notes:
                 print(note)
-        elif choice == '5':
+        elif choice == '7':
             note_manager.save_notes_to_file('notes.json')
             print('Изменения сохранены.')
-        elif choice == '6':
+        elif choice == '8':
             break
         else:
             print('Некорректный выбор. Попробуйте еще раз.')
