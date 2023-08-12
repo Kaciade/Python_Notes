@@ -29,3 +29,18 @@ class NoteManager:
     def filter_notes_by_date(self, date):
         filtered_notes = [note for note in self.notes if note.timestamp.date() == date.date()]
         return filtered_notes
+
+    def save_notes_to_file(self, filename):
+        notes_data = []
+        for note in self.notes:
+            note_data = {
+                'note_id': note.note_id,
+                'title': note.title,
+                'body': note.body,
+                'timestamp': note.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+            }
+            notes_data.append(note_data)
+        
+        with open(filename, 'w') as file:
+            json.dump(notes_data, file, indent=4)
+
