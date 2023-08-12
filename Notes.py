@@ -17,3 +17,11 @@ class NoteManager:
 
     def delete_note(self, note_id):
         self.notes = [note for note in self.notes if note.note_id != note_id]
+    
+    def edit_note(self, note_id, new_title, new_body):
+        for note in self.notes:
+            if note.note_id == note_id:
+                note.title = new_title
+                note.body = new_body
+                note.timestamp = datetime.now()
+                break
