@@ -44,3 +44,16 @@ class NoteManager:
         with open(filename, 'w') as file:
             json.dump(notes_data, file, indent=4)
 
+    def load_notes_from_file(self, filename):
+        with open(filename, 'r') as file:
+            notes_data = json.load(file)
+        
+        self.notes = []
+        for note_data in notes_data:
+            note = Note(
+                note_data['note_id'],
+                note_data['title'],
+                note_data['body']
+            )
+            note.timestamp = datetime.strptime(note_data['timestamp'], '%Y-%m-%d %H:%M:%S')
+            self.notes.append(note)
