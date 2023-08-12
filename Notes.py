@@ -8,6 +8,9 @@ class Note:
         self.body = body
         self.timestamp = datetime.now()
 
+    def __str__(self):
+        return f"Заметка {self.note_id}: {self.title} - {self.body} ({self.timestamp})"
+
 class NoteManager:
     def __init__(self):
         self.notes = []
@@ -16,18 +19,18 @@ class NoteManager:
         self.notes.append(note)
 
     def delete_note(self, note_id):
-        self.notes = [note for note in self.notes if note.note_id != note_id]
+        self.notes = [note for note in self.notes if note.note_id != int(note_id)]
     
     def edit_note(self, note_id, new_title, new_body):
         for note in self.notes:
-            if note.note_id == note_id:
+            if note.note_id == int(note_id):
                 note.title = new_title
                 note.body = new_body
                 note.timestamp = datetime.now()
                 break
     
     def filter_notes_by_date(self, date):
-        filtered_notes = [note for note in self.notes if note.timestamp.date() == date.date()]
+        filtered_notes = [note for note in self.notes if note.timestamp.date() == date]
         return filtered_notes
 
     def save_notes_to_file(self, filename):
@@ -37,16 +40,19 @@ class NoteManager:
                 'note_id': note.note_id,
                 'title': note.title,
                 'body': note.body,
-                'timestamp': note.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+                'timestamp': note.timestamp.isoformat()
             }
             notes_data.append(note_data)
         
         with open(filename, 'w') as file:
-            json.dump(notes_data, file, indent=4)
+            file.write(json.dumps(notes_data, indent=4))
 
     def load_notes_from_file(self, filename):
-        with open(filename, 'r') as file:
-            notes_data = json.load(file)
+        try:
+            with open(filename, 'r') as file:
+                notes_data = json.load(file)
+        except FileNotFoundError:
+            notes_data = []
         
         self.notes = []
         for note_data in notes_data:
@@ -55,7 +61,7 @@ class NoteManager:
                 note_data['title'],
                 note_data['body']
             )
-            note.timestamp = datetime.strptime(note_data['timestamp'], '%Y-%m-%d %H:%M:%S')
+            note.timestamp = datetime.fromisoformat(note_data['timestamp'])
             self.notes.append(note)
 
 def main():
@@ -90,7 +96,7 @@ def main():
             date = datetime.strptime(date_str, '%Y-%m-%d').date()
             filtered_notes = note_manager.filter_notes_by_date(date)
             for note in filtered_notes:
-                print(f'Заметка {note.note_id}: {note.title} - {note.body} ({note.timestamp})')
+                print(note)
         elif choice == '5':
             note_manager.save_notes_to_file('notes.json')
             print('Изменения сохранены.')
