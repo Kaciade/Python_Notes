@@ -25,3 +25,7 @@ class NoteManager:
                 note.body = new_body
                 note.timestamp = datetime.now()
                 break
+    
+    def filter_notes_by_date(self, date):
+        filtered_notes = [note for note in self.notes if note.timestamp.date() == date.date()]
+        return filtered_notes
